@@ -300,3 +300,82 @@ COMMENT ON COLUMN product_parameter.value IS 'Значение параметр�
 --rollback drop table product cascade;
 --rollback drop table category cascade;
 --rollback drop table provider cascade;
+
+-- changeset snegov-ds:2 endDelimiter:/
+CREATE INDEX client_email_idx ON client (email);
+COMMENT ON INDEX client_email_idx IS 'Получение данных клиента по электронной почте';
+/
+CREATE INDEX client_phone_idx ON client(phone);
+COMMENT ON INDEX client_phone_idx IS 'Получение данных клиента по номеру телефона';
+/
+CREATE INDEX order_by_client_product_idx ON "order" (fk_product, fk_client);
+COMMENT ON INDEX order_by_client_product_idx IS 'Получение данных о заказе по fk клиента и товара';
+/
+CREATE INDEX product_by_category_idx ON product (fk_category);
+COMMENT ON INDEX product_by_category_idx IS 'Получение данных о товаре по категории';
+/
+CREATE INDEX product_by_filters_idx ON product (name, fk_category, price);
+COMMENT ON INDEX product_by_filters_idx IS 'Получение данных о товаре по основным фильтрам';
+/
+CREATE INDEX product_parameter_by_ids_idx ON product_parameter(parameter_id, product_id);
+COMMENT ON INDEX product_parameter_by_ids_idx IS 'Получение значения параметра товара по id параметра и товара';
+/
+ALTER TABLE client ALTER COLUMN first_name SET NOT NULL;
+ALTER TABLE client ALTER COLUMN last_name SET NOT NULL;
+ALTER TABLE client ALTER COLUMN email SET NOT NULL;
+ALTER TABLE client ALTER COLUMN phone SET NOT NULL;
+ALTER TABLE client
+    ADD CONSTRAINT phone_pattern_chk CHECK (regexp_match(phone, '^\+\d{11}$') IS NOT NULL);
+ALTER TABLE client
+    ADD CONSTRAINT email_pattern_chk CHECK (email LIKE '%@%');
+ALTER TABLE client
+    ADD CONSTRAINT unique_client_email UNIQUE (email);
+ALTER TABLE client
+    ADD CONSTRAINT unique_client_phone UNIQUE (phone);
+ALTER TABLE client
+    ADD CONSTRAINT age_chk CHECK (date_part('year', age(current_date, birth_date)) > 18 AND
+                                  date_part('year', age(current_date, birth_date)) < 120);
+/
+ALTER TABLE manufacturer ALTER COLUMN name SET NOT NULL;
+ALTER TABLE manufacturer ALTER COLUMN address SET NOT NULL;
+ALTER TABLE manufacturer ALTER COLUMN phone SET NOT NULL;
+ALTER TABLE manufacturer
+    ADD CONSTRAINT unique_manufacturer_name UNIQUE (name);
+ALTER TABLE manufacturer
+    ADD CONSTRAINT unique_manufacturer_phone UNIQUE (phone);
+ALTER TABLE manufacturer
+    ADD CONSTRAINT unique_link_url UNIQUE (link_url);
+/
+ALTER TABLE category ALTER COLUMN name SET NOT NULL;
+ALTER TABLE category
+    ADD CONSTRAINT unique_category_name UNIQUE (name);
+/
+ALTER TABLE parameter ALTER COLUMN name SET NOT NULL;
+ALTER TABLE parameter
+    ADD CONSTRAINT unique_parameter_name UNIQUE (name);
+/
+ALTER TABLE "order" ALTER COLUMN state SET NOT NULL;
+ALTER TABLE "order" ALTER COLUMN date SET NOT NULL;
+/
+ALTER TABLE provider ALTER COLUMN name SET NOT NULL;
+ALTER TABLE provider
+    ADD CONSTRAINT unique_provider_name UNIQUE (name);
+ALTER TABLE provider ALTER COLUMN email SET NOT NULL;
+ALTER TABLE provider
+    ADD CONSTRAINT unique_provider_email UNIQUE (email);
+ALTER TABLE provider
+    ADD CONSTRAINT email_pattern_chk CHECK (email LIKE '%@%');
+ALTER TABLE provider ALTER COLUMN address SET NOT NULL;
+ALTER TABLE provider ALTER COLUMN phone SET NOT NULL;
+ALTER TABLE provider
+    ADD CONSTRAINT unique_provider_phone UNIQUE (phone);
+ALTER TABLE provider
+    ADD CONSTRAINT phone_pattern_chk CHECK (regexp_match(phone, '^\+\d{11}$') IS NOT NULL);
+ALTER TABLE product
+    ADD CONSTRAINT price_product_gt_zero_chk CHECK (price > 0);
+--rollback drop index client_email_idx;
+--rollback drop index client_phone_idx;
+--rollback drop index order_by_client_product_idx;
+--rollback drop index product_by_category_idx;
+--rollback drop index product_by_filters_idx;
+--rollback drop index product_parameter_by_ids_idx;
