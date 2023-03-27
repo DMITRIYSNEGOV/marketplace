@@ -47,3 +47,17 @@ ALTER TABLE table_name
 ALTER TABLE table_name
     ADD CONSTRAINT constraint_check_name CHECK (condition = true);
 ```
+
+# Проектирование БД V2
+## Схема
+![](src/main/resources/images/erd_v2.png)
+
+## Изменения
+Все изменения находятся в changeset snegov-ds:3
+- Были оптимизированы типы данных
+- Изменено название таблицы "order" на "purchase_order" из-за того, что order является ключевым словом в SQL
+- Добавлены таблицы:
+  1) client_history (для логирования старых данных клиента. туда данные добавляются через триггер)
+  2) price_list (отображение цен на конкретный период времени для конкретного товара)
+  3) order_line (возможность добавлять в заказ сразу несколько товаров с разным количеством)
+- Для поля purchase_order.state создан enum со списком статусов у заказа 

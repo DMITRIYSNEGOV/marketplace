@@ -379,3 +379,105 @@ ALTER TABLE product
 --rollback drop index product_by_category_idx;
 --rollback drop index product_by_filters_idx;
 --rollback drop index product_parameter_by_ids_idx;
+
+-- changeset snegov-ds:3 endDelimiter:/
+CREATE SEQUENCE price_list_seq
+    AS BIGINT
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+/
+CREATE TABLE price_list
+(
+    id    bigint NOT NULL DEFAULT nextval('price_list_seq'),
+    price decimal,
+    date_from timestamp,
+    date_to timestamp,
+    CONSTRAINT price_list_pkey PRIMARY KEY (id)
+);
+/
+ALTER TABLE client
+    ALTER COLUMN first_name TYPE varchar(100),
+    ALTER COLUMN last_name TYPE varchar(100),
+    ALTER COLUMN email TYPE varchar(100),
+    ALTER COLUMN phone TYPE varchar(12);
+/
+ALTER TABLE category
+    ALTER COLUMN name TYPE varchar(70);
+/
+ALTER TABLE manufacturer RENAME working_mode TO working_days_mode;
+ALTER TABLE manufacturer
+    ALTER COLUMN name TYPE varchar(100),
+    ALTER COLUMN address TYPE text,
+    ADD COLUMN working_time_mode varchar(11),
+    ADD CONSTRAINT working_time_mode_pattern_chk
+        CHECK(regexp_match(working_time_mode, '^\d\d:\d\d-\d\d:\d\d$') IS NOT NULL),
+    ALTER COLUMN phone TYPE varchar(12),
+    ALTER COLUMN link_url TYPE varchar(200),
+    ALTER COLUMN description TYPE text;
+/
+ALTER TABLE "order" RENAME TO purchase_order;
+ALTER TABLE purchase_order DROP COLUMN fk_product;
+/
+ALTER TABLE product RENAME price to fk_price;
+ALTER TABLE product
+    ALTER COLUMN name TYPE varchar(100),
+    ALTER COLUMN fk_price TYPE bigint;
+ALTER TABLE product
+    ADD CONSTRAINT price_id_fkey FOREIGN KEY (fk_price) REFERENCES price_list(id);
+/
+ALTER TABLE product_parameter ALTER COLUMN value TYPE varchar(100);
+/
+ALTER TABLE provider
+    ALTER COLUMN name TYPE varchar(100),
+    ALTER COLUMN email TYPE varchar(100),
+    ALTER COLUMN address TYPE text,
+    ALTER COLUMN phone TYPE varchar(12);
+/
+CREATE SEQUENCE client_history_seq
+    AS BIGINT
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+/
+CREATE TABLE client_history
+(
+    id    bigint NOT NULL DEFAULT nextval('client_history_seq'),
+    client_id_fkey BIGINT NOT NULL,
+    email varchar(100),
+    phone varchar(12),
+    CONSTRAINT client_history_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_client_id_fkey FOREIGN KEY (client_id_fkey) REFERENCES client (id)
+);
+/
+CREATE FUNCTION log_client_history() RETURNS trigger
+AS
+$$
+BEGIN
+    INSERT INTO client_history SELECT nextval('client_history_seq'), OLD.id, OLD.email, OLD.phone;
+RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER log_client_history AFTER UPDATE ON client
+                                              FOR EACH ROW EXECUTE FUNCTION log_client_history();
+/
+CREATE SEQUENCE order_line_seq
+    AS BIGINT
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+/
+CREATE TABLE order_line
+(
+    id    bigint NOT NULL DEFAULT nextval('order_line_seq'),
+    fk_product bigint NOT NULL,
+    product_count smallint,
+    fk_order bigint NOT NULL,
+    CONSTRAINT order_line_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_order_fkey FOREIGN KEY (fk_order) REFERENCES purchase_order (id),
+    CONSTRAINT fk_product_fkey FOREIGN KEY (fk_product) REFERENCES product (id)
+);
+/
+CREATE TYPE order_state AS ENUM ('CANCELED', 'NEW', 'WAIT_SELLER', 'SHIPPED', 'WAIT_CLIENT', 'EXECUTED');
+ALTER TABLE purchase_order ALTER COLUMN state TYPE order_state USING state::order_state;
