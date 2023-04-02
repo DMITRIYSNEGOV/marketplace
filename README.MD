@@ -6,4 +6,5 @@
 1. [Проектирование БД](documentation/1_erd_v1)
 2. [Добавление индексов и ограничений](documentation/2_add_index_constraint)
 3. [Проектирование БД V2](documentation/3_erd_v2)
+3. [Установка СУБД PostgreSQL](documentation/3_install_postgre)
 4. [DDL: создание, изменение и удаление объектов в PostgreSQL](documentation/4_ddl_postgre)
