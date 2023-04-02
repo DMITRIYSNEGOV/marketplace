@@ -15,7 +15,7 @@ services:
   liquibase:
     image: liquibase/liquibase:4.9.1
     container_name: liquibase_marketplace
-    command: --url="jdbc:postgresql://${DB_HOST}:${CONTAINER_PORT}/postgres?currentSchema=public" --username=${POSTGRES_USER} --password=${POSTGRES_PASSWORD} --changelog-file=${CHANGELOG_FILE}  --logLevel=info update
+    command: --url="jdbc:postgresql://${DB_HOST}:${CONTAINER_PORT}/${LIQUIBASE_DB}?currentSchema=${LIQUIBASE_SCHEMA}" --username=${POSTGRES_USER} --password=${POSTGRES_PASSWORD} --changelog-file=${CHANGELOG_FILE}  --logLevel=info update
     volumes:
       - ./main/resources/db:/liquibase/main/resources/db
     # Ожидаем пока БД не станет доступна
