@@ -1,6 +1,6 @@
 # Проектирование БД V2
 ## Схема
-![](src/main/resources/images/erd_v2.png)
+![](../../src/main/resources/images/erd_v2.png)
 
 ## Изменения
 Все изменения находятся в changeset snegov-ds:3
@@ -21,12 +21,12 @@
 docker-compose up
 ```
 ## Пример выполнения команды
-![](src/main/resources/images/docker_compose/docker_compose_up.png)
+![](../../src/main/resources/images/docker_compose/docker_compose_up.png)
 Так же в этом yaml файле все значения настроек вынесены в .env файл
 То есть ${POSTGRES_USER} будет заменен на значение из .env файла
 
 ## Логи контейнера Postgres
-![](src/main/resources/images/docker_compose/postgres_container_log.png)
+![](../../src/main/resources/images/docker_compose/postgres_container_log.png)
 
 ## Логи контейнера Liquibase
-![](src/main/resources/images/docker_compose/liquibase_container_log.png)
+![](../../src/main/resources/images/docker_compose/liquibase_container_log.png)

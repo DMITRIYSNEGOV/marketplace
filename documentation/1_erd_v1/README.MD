@@ -1,6 +1,6 @@
 # Проектирование БД
 ## Схема
-![](src/main/resources/images/erd.png)
+![](../../src/main/resources/images/erd.png)
 
 ## Документация
 
