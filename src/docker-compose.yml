@@ -1,7 +1,9 @@
 version: '3.8'
 services:
   db:
-    image: postgres:14.1
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
     container_name: postgres
     ports:
       - '${DOCKER_HOST_PORT}:${CONTAINER_PORT}'
@@ -9,8 +11,6 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-    volumes:
-      - db:/var/lib/postgresql/data
     restart: always
   liquibase:
     image: liquibase/liquibase:4.9.1
