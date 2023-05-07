@@ -9,3 +9,4 @@
 4. [Установка СУБД PostgreSQL](documentation/3_install_postgre)
 5. [DDL: создание, изменение и удаление объектов в PostgreSQL](documentation/4_ddl_postgre)
 6. [DML: вставка, обновление, удаление, выборка данных](documentation/5_dml_postgre)
+7. [Индексы](documentation/6_indexes)

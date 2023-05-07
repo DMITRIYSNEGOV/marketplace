@@ -1,16 +1,32 @@
 plugins {
     id 'java'
-    id "org.liquibase.gradle" version "2.1.1"
+    id 'org.liquibase.gradle' version '2.1.1'
+    id 'org.springframework.boot' version '2.7.10'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
     liquibaseRuntime 'org.liquibase:liquibase-core:4.2.2'
@@ -18,11 +34,10 @@ dependencies {
     liquibaseRuntime("org.liquibase:liquibase-core:3.8.1")
     liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:2.1.1")
     liquibaseRuntime("org.postgresql:postgresql:42.2.5")
+
 }
 
-apply plugin: "org.liquibase.gradle"
-
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
 

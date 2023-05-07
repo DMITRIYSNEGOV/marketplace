@@ -154,7 +154,7 @@ create table category
     name        varchar(70)                            not null
         constraint unique_category_name
             unique,
-    subcategory smallint                                 not null
+    subcategory smallint
         constraint subcategory_fkey
             references category
 )
